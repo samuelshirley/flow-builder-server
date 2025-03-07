@@ -1,5 +1,5 @@
 const mongoose = require('mongoose');
-const Survey = require('./models/Survey');
+const Consultation = require('./models/Consultation');
 
 // Database connection
 const connectDB = async () => {
@@ -21,78 +21,78 @@ const connectDB = async () => {
   }
 };
 
-// Survey operations
-const surveyOperations = {
-  // Create a new survey
-  createSurvey: async (surveyData) => {
+// Consultation operations
+const consultationOperations = {
+  // Create a new consultation
+  createConsultation: async (consultationData) => {
     try {
-      const survey = new Survey(surveyData);
-      const savedSurvey = await survey.save();
+      const consultation = new Consultation(consultationData);
+      const savedConsultation = await consultation.save();
       return {
-        ...savedSurvey.toObject(),
-        surveyId: savedSurvey.surveyId
+        ...savedConsultation.toObject(),
+        consultationId: savedConsultation.consultationId
       };
     } catch (error) {
-      throw new Error(`Failed to create survey: ${error.message}`);
+      throw new Error(`Failed to create consultation: ${error.message}`);
     }
   },
 
-  // Get all surveys for a user
-  getUserSurveys: async (userId) => {
+  // Get all consultations for a user
+  getUserConsultations: async (userId) => {
     try {
-      return await Survey.find({ createdBy: userId })
-        .select('surveyId title description createdAt questions')
+      return await Consultation.find({ createdBy: userId })
+        .select('consultationId title description createdAt questions')
         .sort({ createdAt: -1 });
     } catch (error) {
-      throw new Error(`Failed to fetch user surveys: ${error.message}`);
+      throw new Error(`Failed to fetch user consultations: ${error.message}`);
     }
   },
 
-  // Get a single survey by ID
-  getSurveyById: async (surveyId) => {
+  // Get a single consultation by ID
+  getConsultationById: async (consultationId) => {
     try {
-      const survey = await Survey.findOne({ surveyId });
-      if (!survey) {
-        throw new Error('Survey not found');
+      const consultation = await Consultation.findOne({ consultationId });
+      if (!consultation) {
+        throw new Error('Consultation not found');
       }
-      return survey;
+      return consultation;
     } catch (error) {
-      throw new Error(`Failed to fetch survey: ${error.message}`);
+      throw new Error(`Failed to fetch consultation: ${error.message}`);
     }
   },
 
-  // Update a survey
-  updateSurvey: async (surveyId, updateData) => {
+  // Update a consultation
+  updateConsultation: async (consultationId, updateData) => {
     try {
-      const survey = await Survey.findOneAndUpdate(
-        { surveyId },
+      const consultation = await Consultation.findOneAndUpdate(
+        { consultationId },
         { $set: updateData },
         { new: true, runValidators: true }
       );
-      if (!survey) {
-        throw new Error('Survey not found');
+      if (!consultation) {
+        throw new Error('Consultation not found');
       }
-      return survey;
+      return consultation;
     } catch (error) {
-      throw new Error(`Failed to update survey: ${error.message}`);
+      throw new Error(`Failed to update consultation: ${error.message}`);
     }
   },
 
-  // Delete a survey
-  deleteSurvey: async (surveyId) => {
+  // Delete a consultation
+  deleteConsultation: async (consultationId) => {
     try {
-      const survey = await Survey.findOneAndDelete({ surveyId });
-      if (!survey) {
-        throw new Error('Survey not found');
+      const consultation = await Consultation.findOneAndDelete({ consultationId });
+      if (!consultation) {
+        throw new Error('Consultation not found');
       }
-      return survey;
+      return consultation;
     } catch (error) {
-      throw new Error(`Failed to delete survey: ${error.message}`);
+      throw new Error(`Failed to delete consultation: ${error.message}`);
     }
   }
 };
 
 module.exports = {
   connectDB,
-  surveyOperations
+  consultationOperations
 };

@@ -1,8 +1,8 @@
 const mongoose = require('mongoose');
 const { v4: uuidv4 } = require('uuid');
 
-const surveySchema = new mongoose.Schema({
-  surveyId: {
+const consultationSchema = new mongoose.Schema({
+  consultationId: {
     type: String,
     required: true,
     unique: true,
@@ -60,11 +60,11 @@ const surveySchema = new mongoose.Schema({
 });
 
 // Update the updatedAt timestamp before saving
-surveySchema.pre('save', function(next) {
+consultationSchema.pre('save', function(next) {
   this.updatedAt = Date.now();
   next();
 });
 
-const Survey = mongoose.model('Survey', surveySchema);
+const Consultation = mongoose.model('Consultation', consultationSchema);
 
-module.exports = Survey; 
+module.exports = Consultation; 

@@ -3,7 +3,7 @@ const express = require('express');
 const cors = require('cors');
 const morgan = require('morgan');
 const admin = require('firebase-admin');
-const { connectDB, surveyOperations } = require('./db');
+const { connectDB, consultationOperations } = require('./db');
 
 const app = express();
 const port = process.env.PORT || 3001;
@@ -56,17 +56,17 @@ app.get('/', (req, res) => {
   res.json({ message: 'Welcome to the Express server!' });
 });
 
-// Public route to view a survey
-app.get('/surveys/:surveyId', async (req, res) => {
+// Public route to view a consultation
+app.get('/consultations/:consultationId', async (req, res) => {
   try {
-    console.log('Fetching survey with ID:', req.params.surveyId);
-    const survey = await surveyOperations.getSurveyById(req.params.surveyId);
-    if (!survey) {
-      return res.status(404).json({ error: 'Survey not found' });
+    console.log('Fetching consultation with ID:', req.params.consultationId);
+    const consultation = await consultationOperations.getConsultationById(req.params.consultationId);
+    if (!consultation) {
+      return res.status(404).json({ error: 'Consultation not found' });
     }
-    res.json(survey);
+    res.json(consultation);
   } catch (error) {
-    console.error('Error fetching survey:', error);
+    console.error('Error fetching consultation:', error);
     res.status(404).json({ error: error.message });
   }
 });
@@ -82,8 +82,8 @@ app.get('/protected', authenticateUser, (req, res) => {
   });
 });
 
-// Survey routes
-app.post('/api/surveys', authenticateUser, async (req, res) => {
+// Consultation routes
+app.post('/api/consultations', authenticateUser, async (req, res) => {
   try {
     const { title, description, questions } = req.body;
 
@@ -92,8 +92,8 @@ app.post('/api/surveys', authenticateUser, async (req, res) => {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
-    // Create new survey
-    const survey = await surveyOperations.createSurvey({
+    // Create new consultation
+    const consultation = await consultationOperations.createConsultation({
       title,
       description,
       questions,
@@ -101,64 +101,64 @@ app.post('/api/surveys', authenticateUser, async (req, res) => {
     });
 
     res.status(201).json({
-      message: 'Survey saved successfully',
-      survey: {
-        surveyId: survey.surveyId,
-        title: survey.title,
-        description: survey.description,
-        questions: survey.questions,
-        createdAt: survey.createdAt
+      message: 'Consultation saved successfully',
+      consultation: {
+        consultationId: consultation.consultationId,
+        title: consultation.title,
+        description: consultation.description,
+        questions: consultation.questions,
+        createdAt: consultation.createdAt
       }
     });
   } catch (error) {
-    console.error('Error saving survey:', error);
+    console.error('Error saving consultation:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Get all surveys for the authenticated user
-app.get('/api/surveys', authenticateUser, async (req, res) => {
+// Get all consultations for the authenticated user
+app.get('/api/consultations', authenticateUser, async (req, res) => {
   try {
-    const surveys = await surveyOperations.getUserSurveys(req.user.uid);
-    res.json(surveys);
+    const consultations = await consultationOperations.getUserConsultations(req.user.uid);
+    res.json(consultations);
   } catch (error) {
-    console.error('Error fetching surveys:', error);
+    console.error('Error fetching consultations:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Get a single survey
-app.get('/api/surveys/:surveyId', authenticateUser, async (req, res) => {
+// Get a single consultation
+app.get('/api/consultations/:consultationId', authenticateUser, async (req, res) => {
   try {
-    const survey = await surveyOperations.getSurveyById(req.params.surveyId);
-    res.json(survey);
+    const consultation = await consultationOperations.getConsultationById(req.params.consultationId);
+    res.json(consultation);
   } catch (error) {
-    console.error('Error fetching survey:', error);
+    console.error('Error fetching consultation:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Update a survey
-app.put('/api/surveys/:surveyId', authenticateUser, async (req, res) => {
+// Update a consultation
+app.put('/api/consultations/:consultationId', authenticateUser, async (req, res) => {
   try {
-    const survey = await surveyOperations.updateSurvey(req.params.surveyId, req.body);
+    const consultation = await consultationOperations.updateConsultation(req.params.consultationId, req.body);
     res.json({
-      message: 'Survey updated successfully',
-      survey
+      message: 'Consultation updated successfully',
+      consultation
     });
   } catch (error) {
-    console.error('Error updating survey:', error);
+    console.error('Error updating consultation:', error);
     res.status(500).json({ error: error.message });
   }
 });
 
-// Delete a survey
-app.delete('/api/surveys/:surveyId', authenticateUser, async (req, res) => {
+// Delete a consultation
+app.delete('/api/consultations/:consultationId', authenticateUser, async (req, res) => {
   try {
-    await surveyOperations.deleteSurvey(req.params.surveyId);
-    res.json({ message: 'Survey deleted successfully' });
+    await consultationOperations.deleteConsultation(req.params.consultationId);
+    res.json({ message: 'Consultation deleted successfully' });
   } catch (error) {
-    console.error('Error deleting survey:', error);
+    console.error('Error deleting consultation:', error);
     res.status(500).json({ error: error.message });
   }
 });
